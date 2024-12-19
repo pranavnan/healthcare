@@ -1,12 +1,10 @@
-import { inject, injectable } from 'inversify';
-import { DoctorService } from '../services/doctor.service';
+import { inject } from 'inversify';
 import { TYPES } from '../inversify/types';
 import { Request, Response } from 'express';
 import { controller, httpGet } from 'inversify-express-utils';
 import { IDoctorService } from '../interfaces/doctor/doctor.service.interface';
 
 @controller('/doctors')
-// @injectable()
 export class DoctorController {
   constructor(
     @inject(TYPES.DoctorService) private doctorService: IDoctorService
