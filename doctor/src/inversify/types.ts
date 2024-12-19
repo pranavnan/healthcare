@@ -4,5 +4,5 @@ export const TYPES = {
   DoctorRepository: Symbol.for('DoctorRepository'),
   DoctorRepositoryInterface: Symbol.for('DoctorRepositoryInterface'),
   DataSource: Symbol.for('DataSource'),
-  // TypeORMDoctorRepository: Symbol.for('TypeORMDoctorRepository'),
+  TypeORMDoctorRepository: Symbol.for('TypeORMDoctorRepository'),
 };

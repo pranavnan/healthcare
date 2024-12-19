@@ -7,12 +7,11 @@ import { IDoctorRepository } from '../interfaces/doctor/doctor.repository.interf
 @injectable()
 export class DoctorRepository implements IDoctorRepository {
   constructor(
-    @inject(TYPES.DoctorRepository) private doctorRepo: Repository<Doctor>
-  ) // private doctorRepo: Repository<Doctor>
-  {}
+    @inject(TYPES.TypeORMDoctorRepository)
+    private doctorRepo: Repository<Doctor> // private doctorRepo: Repository<Doctor>
+  ) {}
 
   async getAllDoctors() {
-    console.log('at repo');
     return await this.doctorRepo.find();
   }
 }

@@ -6,7 +6,7 @@ import { IDoctorRepository } from '../interfaces/doctor/doctor.repository.interf
 @injectable()
 export class DoctorService implements IDoctorService {
   constructor(
-    @inject(TYPES.DoctorRepositoryInterface)
+    @inject(TYPES.DoctorRepository)
     private doctorRepo: IDoctorRepository
   ) {}
 
@@ -15,8 +15,6 @@ export class DoctorService implements IDoctorService {
   }
 
   async getDoctors() {
-    // throw new Error('hi there');
-    console.log('hi there');
     return await this.doctorRepo.getAllDoctors();
   }
 }

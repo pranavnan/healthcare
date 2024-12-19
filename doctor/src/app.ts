@@ -4,7 +4,6 @@ import { container } from './inversify/container';
 import { InversifyExpressServer } from 'inversify-express-utils';
 import { errorHandler } from '@phntickets/booking';
 import './controllers/doctor.controller';
-// import { doctorRouter } from './routes/doctor.route';
 
 process.env.NODE_ENV = 'test';
 const server = new InversifyExpressServer(container);
