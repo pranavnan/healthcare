@@ -3,7 +3,13 @@ import express from 'express';
 import { container } from './inversify/container';
 import { InversifyExpressServer } from 'inversify-express-utils';
 import { errorHandler } from '@phntickets/booking';
+
+// controllers import
 import './controllers/doctor.controller';
+
+// container binding import
+import './inversify/doctor';
+import './inversify/speciality';
 
 process.env.NODE_ENV = 'test';
 const server = new InversifyExpressServer(container);

@@ -10,14 +10,6 @@ import { IDoctorRepository } from '../interfaces/doctor/doctor.repository.interf
 
 const container = new Container();
 
-container.bind<IDoctorService>(TYPES.DoctorService).to(DoctorService);
-container.bind<IDoctorRepository>(TYPES.DoctorRepository).to(DoctorRepository);
 container.bind<DataSource>(TYPES.DataSource).toConstantValue(AppDataSource);
-container
-  .bind<Repository<Doctor>>(TYPES.TypeORMDoctorRepository)
-  .toDynamicValue((context) => {
-    const dataSource = context.container.get<DataSource>(TYPES.DataSource);
-    return dataSource.getRepository(Doctor);
-  });
 
 export { container };
