@@ -7,7 +7,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { DoctorLocation } from './doctor-location.entities';
-import { Slot } from './slot.entities';
 
 @Entity()
 export class Location {

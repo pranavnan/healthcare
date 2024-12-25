@@ -13,9 +13,7 @@ export class DoctorService implements IDoctorService {
   ) {}
 
   async createDoctor(dto: CreateDoctorDTO): Promise<Doctor> {
-    const doctor = await this.doctorRepo.createAndSaveDoctor(dto);
-
-    return doctor;
+    return await this.doctorRepo.createAndSaveDoctor(dto);
   }
 
   async getDoctors() {

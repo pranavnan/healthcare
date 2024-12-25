@@ -1,0 +1,54 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-service
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+spec:
+  rules:
+    - host: healthcare.dev
+      http:
+        paths:
+          - path: /api/doctor/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: doctor-srv
+                port:
+                  number: 3000
+          - path: /api/location/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: doctor-srv
+                port:
+                  number: 3000
+          - path: /api/doctor-location/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: doctor-srv
+                port:
+                  number: 3000
+          - path: /api/slots/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: doctor-srv
+                port:
+                  number: 3000
+          - path: /api/auth/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: auth-srv
+                port:
+                  number: 3000
+          - path: /api/appointment/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: appointment-srv
+                port:
+                  number: 3000

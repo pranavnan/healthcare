@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doctor-mysql-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: doctor-mysql
+  template:
+    metadata:
+      labels:
+        app: doctor-mysql
+    spec:
+      containers:
+        - name: doctor-mysql
+          image: mysql:latest
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: 'Pranav@2448'
+            - name: MYSQL_DATABASE
+              value: 'healthcare'
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-storage
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: doctor-mysql-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: doctor-mysql-srv
+spec:
+  selector:
+    app: doctor-mysql
+  ports:
+    - name: db
+      protocol: TCP
+      port: 3306
+      targetPort: 3306

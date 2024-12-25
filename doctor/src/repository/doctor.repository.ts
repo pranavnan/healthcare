@@ -5,7 +5,6 @@ import { Doctor } from '../entities/doctor.entities';
 import { IDoctorRepository } from '../interfaces/doctor/doctor.repository.interface';
 import { CreateDoctorDTO } from '../dtos/create-doctor-dto';
 import { ISpecialityRepository } from '../interfaces/speciality/speciality.repository.interface';
-import { localLog } from '../utils/localLog';
 
 @injectable()
 export class DoctorRepository implements IDoctorRepository {

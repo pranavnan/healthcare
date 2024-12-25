@@ -5,7 +5,6 @@ import { DoctorRepository } from '../../repository/doctor.repository';
 import { DoctorService } from '../../services/doctor.service';
 import { container } from '../container';
 import { TYPES } from '../types';
-import { AppDataSource } from '../../../data-source';
 import { Doctor } from '../../entities/doctor.entities';
 
 container.bind<IDoctorService>(TYPES.DoctorService).to(DoctorService);

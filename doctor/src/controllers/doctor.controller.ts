@@ -26,7 +26,7 @@ export class DoctorController {
     });
   }
 
-  async update(req: Request, res: Response) {}
+  // async update(req: Request, res: Response) {}
 
   @httpGet('/')
   async getDoctors(req: Request, res: Response) {
@@ -34,5 +34,5 @@ export class DoctorController {
     res.send(data);
   }
 
-  async getDoctor(req: Request, res: Response) {}
+  // async getDoctor(req: Request, res: Response) {}
 }
