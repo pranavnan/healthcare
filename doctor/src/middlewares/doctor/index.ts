@@ -1,4 +1,4 @@
-import { body } from 'express-validator';
+import { body, param, query } from 'express-validator';
 
 export const createDoctorValidation = [
   body('name')
@@ -32,4 +32,15 @@ export const createDoctorValidation = [
     .optional()
     .isURL()
     .withMessage('Profile URL must be valid'),
+];
+
+export const getAllDoctorValidation = [
+  query('page').optional().isInt().withMessage('Page must be an integer'),
+  query('limit').optional().isInt().withMessage('Limit must be an integer'),
+];
+
+export const getDoctorValidation = [
+  param('id')
+    .isInt()
+    .withMessage('Doctor ID must be provided and it should be an integer'),
 ];

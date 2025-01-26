@@ -1,5 +1,5 @@
 import { Speciality } from '../../entities/speciality.entities';
 
 export interface ISpecialityRepository {
-  findById(id: number): Promise<Speciality>;
+  findById(id: number): Promise<Speciality | null>;
 }

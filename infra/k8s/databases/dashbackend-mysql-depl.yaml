@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dashbackend-mysql-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dashbackend-mysql
+  template:
+    metadata:
+      labels:
+        app: dashbackend-mysql
+    spec:
+      containers:
+        - name: dashbackend-mysql
+          image: mysql:latest
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: 'Pranav@2448'
+            - name: MYSQL_DATABASE
+              value: 'healthcare'
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-storage
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: dashbackend-mysql-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dashbackend-mysql-srv
+spec:
+  selector:
+    app: dashbackend-mysql
+  ports:
+    - name: db
+      protocol: TCP
+      port: 3306
+      targetPort: 3306

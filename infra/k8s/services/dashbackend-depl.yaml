@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dashbackend-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dashbackend
+  template:
+    metadata:
+      labels:
+        app: dashbackend
+    spec:
+      containers:
+        - name: dashbackend # this name is only important for logging purposes
+          image: oopdaddy/dashbackend
+          #          image: us.gcr.io/ticketing-dev-425001/dashbackend
+          env:
+            #            - name: JWT_KEY # this is the name viz we are able to get in the dashbackend service
+            #              valueFrom:
+            #                secretKeyRef:
+            #                  name: jwt-secret
+            #                  key: jwt
+            - name: MYSQL_ROOT_PASSWORD
+              value: 'Pranav@2448'
+            - name: MYSQL_DATABASE
+              value: 'healthcare'
+            - name: MYSQL_USER
+              value: 'root'
+            - name: MYSQL_HOST
+              value: 'dashbackend-mysql-srv'
+            - name: MYSQL_PORT
+              value: '3306'
+            - name: PINECONE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: pinecone-apikey
+                  key: PINECONE_API_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dashbackend-srv
+spec:
+  selector:
+    app: dashbackend
+  ports:
+    - name: dashbackend
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

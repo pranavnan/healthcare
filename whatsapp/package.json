@@ -1,25 +1,13 @@
 {
-  "name": "doctor",
+  "name": "whatsapp",
   "version": "1.0.0",
-  "main": "src/index.ts",
+  "main": "index.js",
   "scripts": {
     "dev": "nodemon src/index.ts",
     "test": "NODE_ENV=test jest --watchAll --no-cache --detectOpenHandles"
   },
-  "jest": {
-    "preset": "ts-jest",
-    "testEnvironment": "node",
-    "setupFilesAfterEnv": [
-      "./src/test/setup.ts"
-    ],
-    "testTimeout": 30000
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "@phntickets/booking": "^1.0.26",
+    "@phntickets/booking": "^1.0.24",
     "@types/express": "^5.0.0",
     "@types/node": "^22.7.4",
     "express": "^4.21.2",
@@ -42,5 +30,9 @@
     "supertest": "^7.0.0",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2"
-  }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
