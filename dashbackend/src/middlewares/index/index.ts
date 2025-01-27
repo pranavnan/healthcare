@@ -1,5 +1,5 @@
+import { PineconeMetric } from '@phntickets/booking';
 import { body } from 'express-validator';
-import { PineconeMetric } from '../../enums/pinecone-metric';
 
 export const createIndexValidation = [
   body('indexName')

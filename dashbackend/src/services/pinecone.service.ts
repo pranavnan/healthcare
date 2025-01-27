@@ -1,8 +1,6 @@
-import { Pinecone } from '@pinecone-database/pinecone';
+import { PineconeService } from '@phntickets/booking';
 
-const pineConeClient = new Pinecone({
-  apiKey: process.env.PINECONE_API_KEY!,
-  maxRetries: 5,
-});
+const pineconeClient = PineconeService.getInstance();
+pineconeClient.initialize(process.env.PINECONE_API_KEY!);
 
-export { pineConeClient };
+export { pineconeClient };

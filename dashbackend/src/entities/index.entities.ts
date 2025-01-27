@@ -8,8 +8,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { IndexType } from './index-type.entities';
-import { PineconeMetric } from '../enums/pinecone-metric';
 import { IndexDocument } from './index-document.entities';
+import { PineconeMetric } from '@phntickets/booking';
 
 @Entity()
 export class Index {

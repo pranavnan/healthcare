@@ -1,7 +1,7 @@
 import { DocumentStatus } from '../enums/document-status';
 
 export interface CreateIndexDocumentDTO {
-  indexName: string;
+  documentName: string;
   text: string;
   doctorLocationId: number;
   status: DocumentStatus;

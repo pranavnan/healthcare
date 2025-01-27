@@ -3,15 +3,30 @@ import { Index } from '../entities/index.entities';
 import { IIndexRepository } from '../interfaces/index/index.repository.interface';
 import { TYPES } from '../inversify/types';
 import { Repository } from 'typeorm';
-import { PineconeMetric } from '../enums/pinecone-metric';
-import { IPineconeRepository } from '../interfaces/pinecone-index/pinecone-index.repository.interface';
+
 import { inject } from 'inversify';
+import {
+  IPineconeService,
+  NotFoundError,
+  PineconeMetric,
+} from '@phntickets/booking';
 
 export class IndexRepository implements IIndexRepository {
   constructor(
     @inject(TYPES.TypeORMIndexRepository) private indexRepo: Repository<Index>,
-    @inject(TYPES.PineconeRepository) private pineconeRepo: IPineconeRepository
+    @inject(TYPES.PineconeService) private pineconeRepo: IPineconeService
   ) {}
+  async getIndex(indexId: number): Promise<Index> {
+    const index = await this.indexRepo.findOne({
+      where: {
+        id: indexId,
+      },
+    });
+    if (!index) {
+      throw new NotFoundError(`Index not found`);
+    }
+    return index;
+  }
 
   async createIndex(
     indexName: string,
@@ -29,7 +44,7 @@ export class IndexRepository implements IIndexRepository {
 
         // i want to do some task after this
 
-        await this.pineconeRepo.createIndex(
+        await this.pineconeRepo.createPineconeIndex(
           indexName,
           dimension,
           metric as PineconeMetric

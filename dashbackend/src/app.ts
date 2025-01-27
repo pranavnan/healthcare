@@ -6,13 +6,15 @@ import { errorHandler } from '@phntickets/booking';
 
 // controllers import
 import './controllers/index.controller';
+import './controllers/index-document.controller';
 
 // container binding import
 import './inversify/index';
-import './inversify/index-type';
-import './inversify/pindecone-index';
-import './inversify/index-documents';
 import './inversify/index-document-type';
+import './inversify/index-documents';
+import './inversify/index-type';
+import './inversify/openai';
+import './inversify/pinecone-index';
 
 const server = new InversifyExpressServer(container);
 

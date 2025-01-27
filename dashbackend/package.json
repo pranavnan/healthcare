@@ -7,7 +7,7 @@
     "test": "NODE_ENV=test jest --watchAll --no-cache --detectOpenHandles"
   },
   "dependencies": {
-    "@phntickets/booking": "^1.0.26",
+    "@phntickets/booking": "^1.0.32",
     "@pinecone-database/pinecone": "^4.1.0",
     "@types/express": "^5.0.0",
     "@types/node": "^22.7.4",

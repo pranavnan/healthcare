@@ -8,4 +8,5 @@ export interface IIndexRepository {
     dimension: number,
     indexType: IndexType
   ): Promise<Index>;
+  getIndex(indexId: number): Promise<Index>;
 }

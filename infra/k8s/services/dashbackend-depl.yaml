@@ -32,11 +32,16 @@ spec:
               value: 'dashbackend-mysql-srv'
             - name: MYSQL_PORT
               value: '3306'
-            - name: PINECONE_API_KEY
+            - name: PINECONE_API_KEY # this is the name viz we are able to get in the dashbackend service
               valueFrom:
                 secretKeyRef:
                   name: pinecone-apikey
                   key: PINECONE_API_KEY
+            - name: OPENAI_API_KEY # this is the name viz we are able to get in the dashbackend service
+              valueFrom:
+                secretKeyRef:
+                  name: openai-secret
+                  key: OPENAI_API_KEY
 ---
 apiVersion: v1
 kind: Service

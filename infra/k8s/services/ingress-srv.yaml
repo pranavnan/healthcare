@@ -10,6 +10,13 @@ spec:
     - host: healthcare.dev
       http:
         paths:
+          - path: /api/dash/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: dashbackend-srv
+                port:
+                  number: 3000
           - path: /api/doctor/?(.*)
             pathType: ImplementationSpecific
             backend:
