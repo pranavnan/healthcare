@@ -11,6 +11,10 @@ import {
   IOpenAIService,
   IPineconeService,
 } from '@phntickets/booking';
+import { QueryResponse, RecordMetadata } from '@pinecone-database/pinecone';
+
+// const embeddingModel = 'text-embedding-3-large';
+const embeddingModel = 'text-embedding-3-small';
 
 export class IndexDocumentRepository {
   constructor(
@@ -19,6 +23,46 @@ export class IndexDocumentRepository {
     @inject(TYPES.OpenAIClient) private openAiService: IOpenAIService,
     @inject(TYPES.PineconeService) private pineconeService: IPineconeService
   ) {}
+
+  private async getOpenaiEmbedding(
+    text: string,
+    dimension?: number
+  ): Promise<number[]> {
+    const embeddings = await this.openAiService.generateEmbedding(
+      text,
+      embeddingModel,
+      dimension
+    );
+    if (!embeddings)
+      throw new BadRequestError('Openai Embedding not generated');
+    return embeddings;
+  }
+
+  async getIndexDocument(
+    text: string,
+    indexName: string,
+    dimension: number
+  ): Promise<QueryResponse<RecordMetadata>> {
+    console.time('openai');
+    const embedding = await this.getOpenaiEmbedding(text, dimension);
+    console.timeEnd('openai');
+
+    const includeMetadata = true;
+    const includeValues = false;
+    const topK = 1;
+
+    console.time('retrieval');
+    const documents = await this.pineconeService.documenQuery(
+      indexName,
+      topK,
+      embedding,
+      includeValues,
+      includeMetadata
+    );
+    console.timeEnd('retrieval');
+
+    return documents;
+  }
 
   async createIndexDocument(
     doctorLocationId: number,
@@ -38,15 +82,7 @@ export class IndexDocumentRepository {
         indexDoc.index = index;
 
         // get openaiEmbedding
-        const embeddings = await this.openAiService.generateEmbedding(
-          text,
-          // 'text-embedding-3-small',
-          'text-embedding-3-large',
-          index.dimension
-        );
-
-        if (!embeddings)
-          throw new BadRequestError('Openai Embedding not generated');
+        const embeddings = await this.getOpenaiEmbedding(text, index.dimension);
 
         const document = await transactionEntityManager.save(indexDoc);
 
@@ -55,6 +91,8 @@ export class IndexDocumentRepository {
           index.index_name,
           embeddings,
           {
+            text,
+            name: documentName,
             status,
             index: index.id,
             doctorLocationId,

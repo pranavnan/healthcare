@@ -1,11 +1,14 @@
 import { Request, Response } from 'express';
-import { controller, httpPost } from 'inversify-express-utils';
+import { controller, httpGet, httpPost } from 'inversify-express-utils';
 import { CreateIndexDocumentDTO } from '../dtos/create-document-dto';
 
 import { TYPES } from '../inversify/types';
 import { IndexDocumentService } from '../services/index-document.service';
 import { inject } from 'inversify';
-import { createIndexDocumentValidation } from '../middlewares/index-document.ts';
+import {
+  createIndexDocumentValidation,
+  getIndexDocumentValidation,
+} from '../middlewares/index-document.ts';
 import { validateRequest } from '@phntickets/booking';
 
 @controller('/api/dash/index-document')
@@ -25,5 +28,17 @@ export class IndexDocument {
       message: 'IndexDocument created sucessfully',
       result,
     });
+  }
+
+  @httpGet('/get-docs-by-text/', ...getIndexDocumentValidation, validateRequest)
+  async getDocument(req: Request, res: Response) {
+    const { text, indexId } = req.query;
+
+    const result = await this.documentService.getIndexDocuments({
+      text: String(text),
+      indexId: Number(indexId),
+    });
+
+    res.status(200).json(result);
   }
 }

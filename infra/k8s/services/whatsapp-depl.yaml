@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whatsapp-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: whatsapp
+  template:
+    metadata:
+      labels:
+        app: whatsapp
+    spec:
+      containers:
+        - name: whatsapp # this name is only important for logging purposes
+          image: oopdaddy/whatsapp
+          #          image: us.gcr.io/ticketing-dev-425001/whatsapp
+          env:
+            #            - name: JWT_KEY # this is the name viz we are able to get in the whatsapp service
+            #              valueFrom:
+            #                secretKeyRef:
+            #                  name: jwt-secret
+            #                  key: jwt
+            - name: MYSQL_ROOT_PASSWORD
+              value: 'Pranav@2448'
+            - name: MYSQL_DATABASE
+              value: 'healthcare'
+            - name: MYSQL_USER
+              value: 'root'
+            - name: MYSQL_HOST
+              value: 'whatsapp-mysql-srv'
+            - name: MYSQL_PORT
+              value: '3306'
+            - name: WEBHOOK_VERIFY_TOKEN
+              value: 'Pranav@2448'
+            - name: PINECONE_API_KEY # this is the name viz we are able to get in the whatsapp service
+              valueFrom:
+                secretKeyRef:
+                  name: pinecone-apikey
+                  key: PINECONE_API_KEY
+            - name: OPENAI_API_KEY # this is the name viz we are able to get in the whatsapp service
+              valueFrom:
+                secretKeyRef:
+                  name: openai-secret
+                  key: OPENAI_API_KEY
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whatsapp-srv
+spec:
+  selector:
+    app: whatsapp
+  ports:
+    - name: whatsapp
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

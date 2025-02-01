@@ -1,4 +1,4 @@
-import { body } from 'express-validator';
+import { body, query } from 'express-validator';
 import { DocumentStatus } from '../../enums/document-status';
 
 export const createIndexDocumentValidation = [
@@ -26,6 +26,17 @@ export const createIndexDocumentValidation = [
     .withMessage('Document type ID must be a positive integer'),
 
   body('indexId')
+    .isInt({ gt: 0 })
+    .withMessage('Index ID must be a positive integer'),
+];
+
+export const getIndexDocumentValidation = [
+  query('text')
+    .isString()
+    .isLength({ min: 1 })
+    .withMessage('Text must be provided'),
+
+  query('indexId')
     .isInt({ gt: 0 })
     .withMessage('Index ID must be a positive integer'),
 ];

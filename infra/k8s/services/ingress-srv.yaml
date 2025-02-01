@@ -10,6 +10,13 @@ spec:
     - host: healthcare.dev
       http:
         paths:
+          - path: /whatsapp/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: whatsapp-srv
+                port:
+                  number: 3000
           - path: /api/dash/?(.*)
             pathType: ImplementationSpecific
             backend:
