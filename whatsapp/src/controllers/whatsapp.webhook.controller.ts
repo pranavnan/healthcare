@@ -8,6 +8,9 @@ import { BaseWebhookHandler } from '../handlers/base-webhook-handler';
 
 const { WEBHOOK_VERIFY_TOKEN } = process.env;
 
+/**
+ * doc https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/components/
+ */
 @controller('/whatsapp/webhook')
 export class WhatsAppController {
   private handler: IWebhookHandler;

@@ -9,4 +9,16 @@ export const TYPES = {
   // Speciality TYPES
   TypeORMSpeciality: Symbol.for('TypeORMSpeciality'),
   SpecialityRepository: Symbol.for('SpecialityRepository'),
+
+  // doc-loc TYPES
+  DocLocService: Symbol.for('DocLocService'),
+  TypeORMDocLocRepository: Symbol.for('TypeORMDocLocRepository'),
+
+  // location TYPES
+  LocationService: Symbol.for('LocationService'),
+  TypeORMLocationRepository: Symbol.for('TypeORMLocationRepository'),
+
+  // slots TYPES
+  SlotService: Symbol.for('SlotService'),
+  TypeORMSlotRepository: Symbol.for('TypeORMSlotRepository'),
 };

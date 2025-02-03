@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appointment-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: appointment
+  template:
+    metadata:
+      labels:
+        app: appointment
+    spec:
+      containers:
+        - name: appointment # this name is only important for logging purposes
+          image: oopdaddy/appointment
+          #          image: us.gcr.io/ticketing-dev-425001/appointment
+          env:
+            #            - name: JWT_KEY # this is the name viz we are able to get in the appointment service
+            #              valueFrom:
+            #                secretKeyRef:
+            #                  name: jwt-secret
+            #                  key: jwt
+            - name: MYSQL_ROOT_PASSWORD
+              value: 'Pranav@2448'
+            - name: MYSQL_DATABASE
+              value: 'healthcare'
+            - name: MYSQL_TEST_DATABASE
+              value: 'healthcare-test'
+            - name: MYSQL_USER
+              value: 'root'
+            - name: MYSQL_HOST
+              value: 'appointment-mysql-srv'
+            - name: MYSQL_PORT
+              value: '3306'
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: appointment-srv
+spec:
+  selector:
+    app: appointment
+  ports:
+    - name: appointment
+      protocol: TCP
+      port: 3000
+      targetPort: 3000

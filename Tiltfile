@@ -1,3 +1,7 @@
+# Brokers
+k8s_yaml('infra/k8s/brokers/zookeeper-depl.yaml')
+k8s_yaml('infra/k8s/brokers/kafka-depl.yaml')
+
 # Services
 k8s_yaml('infra/k8s/services/doctor-depl.yaml')
 k8s_yaml('infra/k8s/services/dashbackend-depl.yaml')

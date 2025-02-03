@@ -31,6 +31,13 @@ spec:
                 name: doctor-srv
                 port:
                   number: 3000
+          - path: /api/slots/?(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: doctor-srv
+                port:
+                  number: 3000
           - path: /api/location/?(.*)
             pathType: ImplementationSpecific
             backend:
