@@ -7,10 +7,10 @@ import { errorHandler } from '@phntickets/booking';
 import './controllers';
 
 // container binding import
-import './inversify/webhook';
-
+import './inversify';
+import { redisClient } from './services/redis.service';
+redisClient.set('ss', 'dd');
 const server = new InversifyExpressServer(container);
-
 server.setConfig((app) => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));

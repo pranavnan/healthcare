@@ -7,4 +7,7 @@ export const TYPES = {
     TextHandler: Symbol.for('TextHandler'),
     ImageHandler: Symbol.for('ImageHandler'),
   },
+  Automation: {
+    RAGService: Symbol.for('RAGService'),
+  },
 };

@@ -9,12 +9,13 @@ import {
   IPineconeService,
   NotFoundError,
   PineconeMetric,
+  TYPES as CommonTYPES,
 } from '@phntickets/booking';
 
 export class IndexRepository implements IIndexRepository {
   constructor(
     @inject(TYPES.TypeORMIndexRepository) private indexRepo: Repository<Index>,
-    @inject(TYPES.PineconeService) private pineconeRepo: IPineconeService
+    @inject(CommonTYPES.PineconeService) private pineconeRepo: IPineconeService
   ) {}
   async getIndex(indexId: number): Promise<Index> {
     const index = await this.indexRepo.findOne({

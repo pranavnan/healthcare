@@ -10,6 +10,7 @@ import {
   BadRequestError,
   IOpenAIService,
   IPineconeService,
+  TYPES as CommonTYPES,
 } from '@phntickets/booking';
 import { QueryResponse, RecordMetadata } from '@pinecone-database/pinecone';
 
@@ -20,8 +21,9 @@ export class IndexDocumentRepository {
   constructor(
     @inject(TYPES.TypeORMIndexDocumentRepository)
     private indexDocRepo: Repository<IndexDocument>,
-    @inject(TYPES.OpenAIClient) private openAiService: IOpenAIService,
-    @inject(TYPES.PineconeService) private pineconeService: IPineconeService
+    @inject(CommonTYPES.OpenAIClient) private openAiService: IOpenAIService,
+    @inject(CommonTYPES.PineconeService)
+    private pineconeService: IPineconeService
   ) {}
 
   private async getOpenaiEmbedding(

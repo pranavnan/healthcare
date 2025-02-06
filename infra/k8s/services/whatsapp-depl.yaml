@@ -44,6 +44,11 @@ spec:
                 secretKeyRef:
                   name: openai-secret
                   key: OPENAI_API_KEY
+            - name: DEEPSEEK_API_KEY # this is the name viz we are able to get in the whatsapp service
+              valueFrom:
+                secretKeyRef:
+                  name: deepseek-secret
+                  key: DEEPSEEK_API_KEY
 ---
 apiVersion: v1
 kind: Service

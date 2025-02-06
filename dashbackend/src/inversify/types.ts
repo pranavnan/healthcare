@@ -1,10 +1,4 @@
 export const TYPES = {
-  // Pinecone Index TYPES
-  PineconeService: Symbol.for('PineconeClient'),
-
-  // OPENAI TYPES
-  OpenAIClient: Symbol.for('OpenAIClient'),
-
   // Index TYPES
   IndexRepository: Symbol.for('IndexRepository'),
   IndexService: Symbol.for('IndexService'),
