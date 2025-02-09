@@ -22,8 +22,8 @@ async function start() {
     const clientId = 'appointment-service';
     await kafkaWrapper.connect(['kafka-srv:9092'], clientId);
 
-    // await new DoctorLocationCreatedListener(kafkaWrapper).listen();
-    // await new SlotCreatedListener(kafkaWrapper).listen();
+    await new DoctorLocationCreatedListener(kafkaWrapper).listen();
+    await new SlotCreatedListener(kafkaWrapper).listen();
   } catch (err) {
     console.log('Failed to start appointment service', err);
   }

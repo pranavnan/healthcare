@@ -27,7 +27,7 @@ export class ConversationHistoryService implements IConversationHistory {
 
     pastConversation.push(newConversation);
 
-    console.log({ pastConversation });
+    // console.log({ pastConversation });
 
     await redisClient.HSET(
       sessionKey,
