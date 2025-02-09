@@ -3,38 +3,46 @@ import {
   TYPES as CommonTYPES,
   IAIChatCompletionService,
   IOpenAIEmbeddingService,
-  IPineconeService,
 } from '@phntickets/booking';
 import {
   OPENAI_COMPLETION_MODEL,
   OPENAI_EMBEDDING_MODEL,
-  SYSTEM_PROMPT,
 } from '../utils/openai';
-import { PINECONE_INDEX } from '../utils/pinecone';
-import { QueryResponse, RecordMetadata } from '@pinecone-database/pinecone';
+import {
+  PINECONE_INDEX,
+  PINECONE_INDEX_TOP_K,
+  PINECONE_INCLUDE_METADATA,
+  PINECONE_INCLUDE_VALUES,
+} from '../utils/pinecone';
 import {
   ChatCompletionMessageParam,
   ChatCompletionTool,
 } from 'openai/resources';
 import { availableFunction } from '../functions';
-import { redisClient } from './redis.service';
-import { InteractionHistoryType } from '../types/interaction-history/interaction-history.types';
+
+import { TYPES } from '../inversify/types';
+import { IDocumentRetrieverService } from '../interface/pinecone/document-retrieval.interface';
+import { SystemPromptGenerator } from '../utils/helper-classes/system-prompt-generator';
+import { IConversationHistory } from '../interface/user/conversation-history.interface';
 
 export class RAGService {
   constructor(
     @inject(CommonTYPES.OpenAIEmbeddingClient)
     private openAIEmbeddingService: IOpenAIEmbeddingService,
-    @inject(CommonTYPES.PineconeService)
-    private pineconeClient: IPineconeService,
+    @inject(TYPES.Pinecone.DocumentRetrieverService)
+    private docsRetrieverService: IDocumentRetrieverService,
     @inject(CommonTYPES.AIChatCompletionService)
-    private aiChatCompletionService: IAIChatCompletionService
+    private aiChatCompletionService: IAIChatCompletionService,
+    @inject(TYPES.Automation.ConversationHistoryService)
+    private conversationHistoryService: IConversationHistory
   ) {}
 
   async getRAGResponse(userQuery: string, userNumber: string) {
-    // console.time('RAGService.getRAGResponse');
-
     console.time('RAGService.getRAGResponse.getEmbeddings');
-    const embeddings = await this.getEmbeddings(userQuery);
+    const [embeddings, userConversationHistory] = await Promise.all([
+      this.getEmbeddings(userQuery),
+      this.conversationHistoryService.getUserConversationHistory(userNumber),
+    ]);
     console.timeEnd('RAGService.getRAGResponse.getEmbeddings');
 
     if (!embeddings) {
@@ -42,61 +50,38 @@ export class RAGService {
     }
 
     console.time('RAGService.getRAGResponse.getDocuments');
-    const docs = await this.getDocuments(embeddings);
+    const docs = await this.docsRetrieverService.getDocuments(
+      PINECONE_INDEX,
+      PINECONE_INDEX_TOP_K,
+      embeddings,
+      PINECONE_INCLUDE_METADATA,
+      PINECONE_INCLUDE_VALUES
+    );
     console.timeEnd('RAGService.getRAGResponse.getDocuments');
 
     if (!docs) {
       throw new Error('Could not get documents');
     }
-    const userHistory = await this.getUserInteractionHistory(userNumber);
 
-    const systemPrompt = this.generateSystemPrompt(
+    // Generate system prompt using helper class
+    const systemPrompt = SystemPromptGenerator.generate(
       userQuery,
-      userHistory,
+      userConversationHistory,
       docs
     );
-    const retrievedDocuments = this.getFormattedDocuments(docs);
 
-    // const history = (await this.getUserInteractionHistory(userNumber)).map(ele => ({ role: 'assistant', content: `Past Retrieval Documents: {${ele.retrieval.map((ele, i) => `--- Document ${i + 1} ---\n` + + `Source: ${ele}\n`).join('\n'))}}` }));
-
-    const history = userHistory.reduce((acc, curr) => {
-      acc.push({
-        role: 'user',
-        content: curr.userQuery,
-      });
-      acc.push({
-        role: 'assistant',
-        content: curr.botResponse,
-      });
-      return acc;
-    }, [] as ChatCompletionMessageParam[]);
-    // const history = userHistory.map((ele) => {
-    //   return {
-    //     role: ele.tool_calls ? 'assistant' : 'user',
-    //     content: `Past Retrieval Documents: {${ele.retrieval
-    //       .map((retrievDoc, i) => {
-    //         console.log({ retrievDoc });
-    //         return `--- Document ${i + 1} ---\n` + `Source: ${retrievDoc}\n`;
-    //       })
-    //       .join('\n')}} Past BotResponse: {${
-    //       ele.botResponse
-    //     }} Past UserQuery:{ ${ele.userQuery}}`,
-    //     tool_calls: ele.tool_calls,
-    //   };
-    // }) as ChatCompletionMessageParam[];
-
-    console.log({ systemPrompt, retrievedDocuments, history });
+    // Separate history transformation logic into its own private method
+    const history = this.buildHistoryMessages(userConversationHistory);
+    console.dir({ history }, { depth: null });
 
     const messages: ChatCompletionMessageParam[] = [
       {
         role: 'system',
-        // role: 'developer',
         content: systemPrompt,
       },
       ...history,
       {
         role: 'user',
-        // content: `Reference these documents:\n${retrievedDocuments}\n\nQuestion: ${userQuery}`,
         content: userQuery,
       },
     ];
@@ -117,42 +102,53 @@ export class RAGService {
     const retrievalDocs = docs.matches.map(
       (doc) => doc.metadata?.text as string
     );
-    await this.setUserInteractionHistory(userNumber, {
-      userQuery,
-      botResponse: responseText || '',
-      retrieval: retrievalDocs,
-      tool_calls: functionCall,
-    });
-    // console.timeEnd('RAGService.getRAGResponse');
-  }
-
-  private async setUserInteractionHistory(
-    userNumber: string,
-    userInteractions: InteractionHistoryType
-  ) {
-    const sessionKey = `session:${userNumber}`;
-
-    const existingData = await this.getUserInteractionHistory(userNumber);
-
-    existingData.push(userInteractions);
-
-    console.log({ existingData });
-
-    redisClient.HSET(
-      sessionKey,
-      'userInteractions',
-      JSON.stringify(existingData)
+    await this.conversationHistoryService.saveUserConversationHistory(
+      userNumber,
+      userConversationHistory,
+      {
+        userQuery,
+        botResponse: responseText || '',
+        retrieval: retrievalDocs,
+        tool_calls: functionCall,
+      }
     );
   }
 
-  private async getUserInteractionHistory(userNumber: string) {
-    const sessionKey = `session:${userNumber}`;
-    const existingData = await redisClient.HGET(sessionKey, 'userInteractions');
+  private buildHistoryMessages(
+    userConversationHistory: any[]
+  ): ChatCompletionMessageParam[] {
+    return userConversationHistory.reduce((acc, curr) => {
+      // Add user message
+      acc.push({
+        role: 'user',
+        content: curr.userQuery,
+      });
+      // Build assistant message with optional content and tool_calls
+      const assistantMessage: any = { role: 'assistant' };
+      if (curr.botResponse) {
+        assistantMessage.content = curr.botResponse || '';
+      }
+      if (curr.tool_calls) {
+        assistantMessage.tool_calls = curr.tool_calls.map((tool: any) => ({
+          ...tool,
+          type: 'function', // ensuring type compatibility
+        }));
+      }
+      acc.push(assistantMessage as ChatCompletionMessageParam);
 
-    if (existingData) {
-      return JSON.parse(existingData) as InteractionHistoryType[];
-    }
-    return [];
+      // Optionally add individual tool messages if any tool calls exist
+      if (curr.tool_calls) {
+        for (const toolHistory of curr.tool_calls) {
+          acc.push({
+            role: 'tool',
+            tool_call_id: toolHistory.id,
+            content: toolHistory.function.arguments,
+            type: 'function',
+          } as ChatCompletionMessageParam);
+        }
+      }
+      return acc;
+    }, [] as ChatCompletionMessageParam[]);
   }
 
   private getFunctionTools(): ChatCompletionTool[] {
@@ -165,73 +161,6 @@ export class RAGService {
         strict: value.strict,
       },
     }));
-  }
-
-  private getFormattedDocuments(docs: QueryResponse<RecordMetadata>) {
-    return docs.matches
-      .map(
-        (doc, i) =>
-          `--- Document ${i + 1} ---\n` +
-          `${doc.metadata!.name}\n` +
-          `Source: ${doc.metadata!.text}\n`
-      )
-      .join('\n');
-  }
-
-  private generateSystemPrompt(
-    userQuery: string,
-    userHistory: InteractionHistoryType[],
-    docs: QueryResponse<RecordMetadata>
-  ): string {
-    let systemPrompt = SYSTEM_PROMPT.replace('@user_query', userQuery);
-    systemPrompt = systemPrompt.replace(
-      '@current_date_time',
-      new Date().toISOString()
-    );
-    const retrievalDocs = new Set(),
-      userQueryArr: string[] = [],
-      botResponse: string[] = [];
-    docs.matches.forEach((doc, i) => {
-      systemPrompt = systemPrompt.replace(
-        `@doc_${i + 1}`,
-        doc.metadata!.text as string
-      );
-      // retrievalDocs.add(doc.metadata!.text);
-    });
-    userHistory.forEach((ele) => {
-      userQueryArr.push(`Past UserQuery: ${ele.userQuery}`);
-      botResponse.push(`Past BotResponse: ${ele.botResponse}`);
-      ele.retrieval.forEach((retrievalDoc) => {
-        retrievalDocs.add(retrievalDoc);
-      });
-    });
-
-    systemPrompt = systemPrompt.replace(
-      '@past_retrieval_documents',
-      JSON.stringify(Array.from(retrievalDocs).join('\n\n'))
-    );
-    // systemPrompt = systemPrompt.replace(
-    //   '@past_user_queries',
-    //   userQueryArr.join('\n') as string
-    // );
-    // systemPrompt = systemPrompt.replace(
-    //   '@past_bot_responses',
-    //   botResponse.join('\n')
-    // );
-    return systemPrompt;
-  }
-
-  private async getDocuments(
-    embeddings: number[]
-  ): Promise<QueryResponse<RecordMetadata>> {
-    const docs = await this.pineconeClient.documenQuery(
-      PINECONE_INDEX,
-      3,
-      embeddings,
-      false,
-      true
-    );
-    return docs;
   }
 
   private async getEmbeddings(text: string) {

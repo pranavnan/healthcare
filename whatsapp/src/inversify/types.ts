@@ -9,5 +9,9 @@ export const TYPES = {
   },
   Automation: {
     RAGService: Symbol.for('RAGService'),
+    ConversationHistoryService: Symbol.for('ConversationHistoryService'),
+  },
+  Pinecone: {
+    DocumentRetrieverService: Symbol.for('DocumentRetrieverService'),
   },
 };

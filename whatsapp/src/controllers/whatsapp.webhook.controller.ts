@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { controller, httpGet, httpPost } from 'inversify-express-utils';
 import { IWebhookHandler } from '../interface/whatsapp/webhook-handler.interface';
 import { WhatsAppWebhookPayload } from '../types/webhooks/whatsapp-webhook.types';
