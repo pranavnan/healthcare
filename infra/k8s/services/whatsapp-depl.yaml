@@ -34,6 +34,10 @@ spec:
               value: '3306'
             - name: WEBHOOK_VERIFY_TOKEN
               value: 'Pranav@2448'
+            - name: WHATSAPP_PHONE_NUMBER_ID
+              value: '227707410434620'
+            - name: WHATSAPP_ACCESS_TOKEN
+              value: 'EAAF2DM2fAtUBO9hpS4pTXu3yFOOOaiSrbZCqv1mzGJSqtmn2aIqCQzjj1K71LJqZBBvGmDRjLvev9RsghZAlezUTl8wx3LKe83NH4b0Xlw4iakUAeiqY7Q5hZC8jkCumNz4DDDn8WVJRE9xYc9BrWJEHMoDMWlSo0V1vXyjh09NAANDQaaC4c7qBj58EXMfIjAZDZD'
             - name: PINECONE_API_KEY # this is the name viz we are able to get in the whatsapp service
               valueFrom:
                 secretKeyRef:

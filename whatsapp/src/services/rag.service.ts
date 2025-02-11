@@ -38,7 +38,7 @@ export class RAGService {
     private conversationHistoryService: IConversationHistory
   ) {}
 
-  async getRAGResponse(userQuery: string, userNumber: string) {
+  async getRAGResponse(userQuery: string, userNumber: string): Promise<string> {
     try {
       console.time('RAGService.getRAGResponse.getEmbeddings');
       const [embeddings, userConversationHistory] = await Promise.all([
@@ -120,8 +120,10 @@ export class RAGService {
         userConversationHistory,
         currentConversation
       );
+      return responseText || '';
     } catch (error) {
       console.error('Error in RAGService.getRAGResponse', error);
+      return '';
     }
   }
 

@@ -14,4 +14,7 @@ export const TYPES = {
   Pinecone: {
     DocumentRetrieverService: Symbol.for('DocumentRetrieverService'),
   },
+  MessageSend: {
+    MessageSendService: Symbol.for('MessageSendService'),
+  },
 };

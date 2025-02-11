@@ -11,7 +11,9 @@ import { TYPES } from '../inversify/types';
 
 export class SlotService {
   constructor(
-    @inject(TYPES.TypeORMSlotRepository) private slotRepo: Repository<Slot>
+    @inject(TYPES.TypeORMSlotRepository) private slotRepo: Repository<Slot>,
+    @inject(TYPES.TypeORMDocLocRepository)
+    private docLocRepo: Repository<DoctorLocation>
   ) {}
 
   async createSlot(dto: CreateSlotDTO, allowedFields: string[]) {
@@ -21,7 +23,7 @@ export class SlotService {
     const dayOfWeek = dto.day_of_week;
 
     // [10:00:00,10:15:00] [10:10, 10:20]
-    const checkedData = await this.slotRepo
+    const checkedData = await this.docLocRepo
       .createQueryBuilder()
       .select([
         'docloc.id AS docLocId',
