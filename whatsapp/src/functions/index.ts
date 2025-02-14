@@ -1,6 +1,17 @@
 import { IFunction } from '../interface/openai/function.interface';
-import { handleAppointmentForDoctorAndLocation } from './general-booking';
+import { container } from '../inversify/container';
+import { TYPES } from '../inversify/types';
 
-export const availableFunction: Record<string, IFunction> = {
-  handleAppointmentForDoctorAndLocation,
-};
+export function getAvailableFunctions(): Record<string, IFunction> {
+  return {
+    handle_appointment_for_doctor_and_location: container.get<IFunction>(
+      TYPES.Appointments.HandleAppointmentForDoctorAndLocation
+    ),
+  };
+}
+
+// export const availableFunction: Record<string, IFunction> = {
+//   handle_appointment_for_doctor_and_location: container.get<IFunction>(
+//     TYPES.Appointments.HandleAppointmentForDoctorAndLocation
+//   ),
+// };

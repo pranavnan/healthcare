@@ -4,6 +4,6 @@ export interface IFunction {
   name: string;
   description: string;
   parameters: FunctionParameters;
-  execute: (args: any) => any;
+  execute: (args: any, otherOptions: any) => any;
   strict?: boolean;
 }

@@ -18,13 +18,15 @@ import {
   ChatCompletionMessageParam,
   ChatCompletionTool,
 } from 'openai/resources';
-import { availableFunction } from '../functions';
 
 import { TYPES } from '../inversify/types';
 import { IDocumentRetrieverService } from '../interface/pinecone/document-retrieval.interface';
 import { SystemPromptGenerator } from '../utils/helper-classes/system-prompt-generator';
 import { IConversationHistory } from '../interface/user/conversation-history.interface';
 import { ConversationHistoryType } from '../types/interaction-history/conversation-history.types';
+import { QueryResponse, RecordMetadata } from '@pinecone-database/pinecone';
+import { getAvailableFunctions } from '../functions';
+import { IFunction } from '../interface/openai/function.interface';
 
 export class RAGService {
   constructor(
@@ -38,31 +40,39 @@ export class RAGService {
     private conversationHistoryService: IConversationHistory
   ) {}
 
-  async getRAGResponse(userQuery: string, userNumber: string): Promise<string> {
+  async getRAGResponse(
+    userQuery: string,
+    userNumber: string,
+    passedDocument: boolean = true
+  ): Promise<string> {
     try {
-      console.time('RAGService.getRAGResponse.getEmbeddings');
-      const [embeddings, userConversationHistory] = await Promise.all([
-        this.getEmbeddings(userQuery),
-        this.conversationHistoryService.getUserConversationHistory(userNumber),
-      ]);
-      console.timeEnd('RAGService.getRAGResponse.getEmbeddings');
+      const userConversationHistory =
+        await this.conversationHistoryService.getUserConversationHistory(
+          userNumber
+        );
 
-      if (!embeddings) {
-        throw new Error('Could not generate embeddings');
-      }
+      let docs: QueryResponse<RecordMetadata> = { matches: [], namespace: '' };
 
-      console.time('RAGService.getRAGResponse.getDocuments');
-      const docs = await this.docsRetrieverService.getDocuments(
-        PINECONE_INDEX,
-        PINECONE_INDEX_TOP_K,
-        embeddings,
-        PINECONE_INCLUDE_METADATA,
-        PINECONE_INCLUDE_VALUES
-      );
-      console.timeEnd('RAGService.getRAGResponse.getDocuments');
+      if (passedDocument) {
+        console.time('RAGService.getRAGResponse.getEmbeddings');
+        const embeddings = await this.getEmbeddings(userQuery);
+        console.timeEnd('RAGService.getRAGResponse.getEmbeddings');
+        if (!embeddings) {
+          throw new Error('Could not generate embeddings');
+        }
+        console.time('RAGService.getRAGResponse.getDocuments');
+        docs = await this.docsRetrieverService.getDocuments(
+          PINECONE_INDEX,
+          PINECONE_INDEX_TOP_K,
+          embeddings,
+          PINECONE_INCLUDE_METADATA,
+          PINECONE_INCLUDE_VALUES
+        );
+        console.timeEnd('RAGService.getRAGResponse.getDocuments');
 
-      if (!docs) {
-        throw new Error('Could not get documents');
+        if (!docs) {
+          throw new Error('Could not get documents');
+        }
       }
 
       // Updated to use the helper class
@@ -75,8 +85,8 @@ export class RAGService {
       //   this.docsRetrieverService.getFormattedDocuments(docs);
 
       const history = this.buildHistory(userConversationHistory);
-      // console.log({ systemPrompt });
-      console.dir({ history }, { depth: null });
+      console.log(systemPrompt, '\n\n', systemPrompt);
+      // console.dir({ history }, { depth: null });
 
       const messages: ChatCompletionMessageParam[] = [
         {
@@ -90,7 +100,9 @@ export class RAGService {
         },
       ];
 
-      const functionTools = this.getFunctionTools();
+      const availableFunction = getAvailableFunctions();
+
+      const functionTools = this.getFunctionTools(availableFunction);
 
       console.time('RAGService.getRAGResponse');
       const response = await this.aiChatCompletionService.completion(
@@ -120,6 +132,20 @@ export class RAGService {
         userConversationHistory,
         currentConversation
       );
+
+      if (functionCall) {
+        const options = {
+          userNumber,
+        };
+        for (const toolCall of functionCall) {
+          // toolCall.function.arguments = JSON.parse(toolCall.function.arguments);
+          await availableFunction[functionCall[0].function.name].execute(
+            toolCall.function.arguments,
+            options
+          );
+        }
+      }
+
       return responseText || '';
     } catch (error) {
       console.error('Error in RAGService.getRAGResponse', error);
@@ -151,7 +177,9 @@ export class RAGService {
     }, [] as ChatCompletionMessageParam[]);
   }
 
-  private getFunctionTools(): ChatCompletionTool[] {
+  private getFunctionTools(
+    availableFunction: Record<string, IFunction>
+  ): ChatCompletionTool[] {
     return Object.values(availableFunction).map((value) => ({
       type: 'function',
       function: {

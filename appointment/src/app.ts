@@ -6,12 +6,14 @@ import { AppDataSource } from './data-source';
 import { Slot } from './entities/slot.entities';
 import { Appointment } from './entities/appointment.entities';
 import { appointmentRouter } from './routes/appointment/router';
+import { slotRouter } from './routes/slot/router';
 
 const app = express();
 
 app.use(express.json());
 
 app.use(appointmentRouter);
+app.use(slotRouter);
 
 app.get('/api/appointment', async (req, res) => {
   const slotRepo = AppDataSource.getRepository(Slot);

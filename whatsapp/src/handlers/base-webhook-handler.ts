@@ -41,8 +41,12 @@ export abstract class BaseWebhookHandler implements IWebhookHandler {
    */
   async handle(payload: WhatsAppWebhookPayload) {
     if (this.canHandle(payload)) {
+      console.log(`Handler ${this.constructor.name} is handling the payload`);
       await this.processPayload(payload);
     } else if (this.nextHandler) {
+      console.log(
+        `Handler ${this.constructor.name} is passing the payload to the next handler`
+      );
       await this.nextHandler.handle(payload);
     } else {
       throw new NotFoundError(

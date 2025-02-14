@@ -17,4 +17,10 @@ export const TYPES = {
   MessageSend: {
     MessageSendService: Symbol.for('MessageSendService'),
   },
+  Appointments: {
+    AppointmentService: Symbol.for('AppointmentService'),
+    HandleAppointmentForDoctorAndLocation: Symbol.for(
+      'HandleAppointmentForDoctorAndLocation'
+    ),
+  },
 };
