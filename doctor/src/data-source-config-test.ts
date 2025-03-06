@@ -2,11 +2,12 @@ import { DataSourceOptions } from 'typeorm';
 
 const TestDataSource: DataSourceOptions = {
   type: 'mysql',
-  host: 'localhost',
+  // host: 'localhost',
+  host: '127.0.0.1',
   port: 3306,
   username: 'root',
-  password: 'Pranav@2448',
-  database: 'healthcare',
+  password: '',
+  database: 'testdb',
   synchronize: true, // Set this to false in production
   // entities: ['./entities/**/*.entity.ts'],
   entities: ['src/entities/*{.ts,.js}'], // always give the path from root of our project
