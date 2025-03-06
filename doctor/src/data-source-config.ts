@@ -12,7 +12,7 @@ const MainDataSource: DataSourceOptions = {
   entities: ['src/entities/*{.ts,.js}'], // always give the path from root of our project
   logging: true, // this will log each and every query executed by typeorm
 };
-console.log(MainDataSource);
+// console.log(MainDataSource);
 // const MainDataSource: DataSourceOptions = {
 //   type: "mysql",
 //   host: process.env.MYSQL_HOST,
