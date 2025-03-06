@@ -28,10 +28,10 @@ jobs:
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14'
+        node-version: '18'
 
     - name: Install dependencies
-      run: npm install
+      run: cd doctor && npm install
 
     - name: Wait for MySQL
       run: |
@@ -47,4 +47,4 @@ jobs:
         DATABASE_USER: root
         DATABASE_PASSWORD: ""
         DATABASE_NAME: testdb
-      run: npm test:ci
+      run: npm run test:ci
