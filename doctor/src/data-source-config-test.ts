@@ -6,7 +6,7 @@ const TestDataSource: DataSourceOptions = {
   host: '127.0.0.1',
   port: 3306,
   username: 'root',
-  password: 'Pranav@2448',
+  password: '',
   database: 'healthcare',
   synchronize: true, // Set this to false in production
   // entities: ['./entities/**/*.entity.ts'],
