@@ -47,4 +47,4 @@ jobs:
         DATABASE_USER: root
         DATABASE_PASSWORD: ""
         DATABASE_NAME: testdb
-      run: npm run test:ci
+      run: cd doctor && npm run test:ci
