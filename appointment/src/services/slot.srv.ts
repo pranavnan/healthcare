@@ -23,7 +23,7 @@ export class SlotService {
         'slot.appointment',
         'appointment',
         'appointment.appointmentDate = :appointmentDate AND appointment.status != :status',
-        { appointmentDate, status: 'cancelled' }
+        { appointmentDate, status: 'created' }
       )
       .where('slot.doctorLocation = :doctorLocationId', { doctorLocationId })
       .andWhere('slot.is_available = true')

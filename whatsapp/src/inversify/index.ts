@@ -5,3 +5,4 @@ import './rag';
 import './webhook';
 import './whatsapp';
 import './custom-functions';
+import './axios-instance';

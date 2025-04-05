@@ -9,6 +9,9 @@ k8s_yaml('infra/k8s/services/ingress-srv.yaml')
 k8s_yaml('infra/k8s/services/redis-depl.yaml')
 k8s_yaml('infra/k8s/services/whatsapp-depl.yaml')
 k8s_yaml('infra/k8s/services/appointment-depl.yaml')
+k8s_yaml('infra/k8s/services/auth-depl.yaml')
+k8s_yaml('infra/k8s/services/client-depl.yaml')
+
 
 
 # Databases
@@ -16,6 +19,7 @@ k8s_yaml('infra/k8s/databases/doctor-mysql-depl.yaml')
 k8s_yaml('infra/k8s/databases/dashbackend-mysql-depl.yaml')
 k8s_yaml('infra/k8s/databases/whatsapp-mysql-depl.yaml')
 k8s_yaml('infra/k8s/databases/appointment-mysql-depl.yaml')
+k8s_yaml('infra/k8s/databases/auth-mongo-depl.yaml')
 
 
 # Project images for syncing 
@@ -23,6 +27,8 @@ docker_build('oopdaddy/doctor', 'doctor', live_update=[sync('doctor/src', '/app/
 docker_build('oopdaddy/dashbackend', 'dashbackend', live_update=[sync('dashbackend/src', '/app/src')])
 docker_build('oopdaddy/whatsapp', 'whatsapp', live_update=[sync('whatsapp/src', '/app/src')])
 docker_build('oopdaddy/appointment', 'appointment', live_update=[sync('appointment/src', '/app/src')])
+docker_build('oopdaddy/auth', 'auth', live_update=[sync('auth/src', '/app/src')])
+docker_build('oopdaddy/client', 'client', live_update=[sync('client/src', '/app/src')])
 
 # Databases port forward 
 k8s_resource("doctor-mysql-depl", port_forwards="3306:3306") #port forward
@@ -30,6 +36,7 @@ k8s_resource("dashbackend-mysql-depl", port_forwards="3307:3306") #port forward
 k8s_resource("whatsapp-mysql-depl", port_forwards="3308:3306") #port forward
 k8s_resource("appointment-mysql-depl", port_forwards="3309:3306") #port forward
 k8s_resource("redis-depl", port_forwards="6379:6379") #port forward
+k8s_resource("auth-mongo-depl", port_forwards="27018:27017") #port forward
 
 
 # Services port forward 
@@ -37,3 +44,4 @@ k8s_resource("doctor-depl", port_forwards="3001:3000") #port forward
 k8s_resource("dashbackend-depl", port_forwards="3002:3000") #port forward
 k8s_resource("whatsapp-depl", port_forwards="6000:3000") #port forward
 k8s_resource("appointment-depl", port_forwards="6001:3000") #port forward
+k8s_resource("auth-depl", port_forwards="6002:3000") #port forward

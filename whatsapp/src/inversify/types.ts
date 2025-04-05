@@ -6,6 +6,8 @@ export const TYPES = {
     SubMessageHandler: Symbol.for('SubMessageHandler'),
     TextHandler: Symbol.for('TextHandler'),
     ImageHandler: Symbol.for('ImageHandler'),
+    MainHandler: Symbol.for('MainHandler'),
+    MessageHandler: Symbol.for('MessageHandler'),
   },
   Automation: {
     RAGService: Symbol.for('RAGService'),
@@ -23,4 +25,7 @@ export const TYPES = {
       'HandleAppointmentForDoctorAndLocation'
     ),
   },
+  Axios: {
+    AppointmentAxiosInstance: Symbol.for('AppointmentAxiosInstance'),
+  }
 };

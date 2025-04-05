@@ -4,7 +4,6 @@ import { IWebhookHandler } from '../interface/whatsapp/webhook-handler.interface
 import { WhatsAppWebhookPayload } from '../types/webhooks/whatsapp-webhook.types';
 import { inject } from 'inversify';
 import { TYPES } from '../inversify/types';
-import { BaseWebhookHandler } from '../handlers/base-webhook-handler';
 
 const { WEBHOOK_VERIFY_TOKEN } = process.env;
 
@@ -13,18 +12,10 @@ const { WEBHOOK_VERIFY_TOKEN } = process.env;
  */
 @controller('/whatsapp/webhook')
 export class WhatsAppController {
-  private handler: IWebhookHandler;
-
   constructor(
-    @inject(TYPES.WhatsappWebhook.WhatsappMessageHandler)
-    private messageHandler: BaseWebhookHandler,
-    @inject(TYPES.WhatsappWebhook.WhatsappStatusHandler)
-    private statusHandler: BaseWebhookHandler
-  ) {
-    messageHandler.setNext(statusHandler);
-
-    this.handler = messageHandler;
-  }
+    @inject(TYPES.WhatsappWebhook.MainHandler)
+    private handler: IWebhookHandler<WhatsAppWebhookPayload>
+  ) {}
 
   @httpGet('/:botnumber')
   async verifyToken(req: Request, res: Response): Promise<void> {
@@ -47,13 +38,16 @@ export class WhatsAppController {
     try {
       const payload = req.body as WhatsAppWebhookPayload;
 
-      this.handler.handle(payload).then(r => console.log(r)).catch(console.error);
+      this.handler
+        .handle(payload)
+        .then((r) => console.log({ [this.handler.constructor.name]: r }))
+        .catch(console.error);
 
       res.status(200).send('OK');
     } catch (err) {
       console.error('Error while handling webhook:', err);
-      res.status(200).send('OK');
-      // res.status(500).send('Error while handling webhook');
+      // res.status(200).send('OK');
+      res.status(500).send('Error while handling webhook');
     }
   }
 }

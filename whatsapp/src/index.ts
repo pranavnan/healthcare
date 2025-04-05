@@ -1,11 +1,14 @@
 import { app } from './app';
 import { AppDataSource } from './data-source';
+import Logger from './utils/logger';
 
 AppDataSource.initialize()
   .then(() => {
     const PORT = 3000;
     app.listen(PORT, () => {
-      console.log('Whatsapp server started on PORT: ', PORT);
+      Logger.info(`WhatsApp server started on PORT: ${PORT}`);
     });
   })
-  .catch(console.error);
+  .catch((error) => {
+    Logger.error('Error initializing data source:', error);
+  });

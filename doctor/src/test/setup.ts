@@ -27,7 +27,7 @@ beforeAll(async function () {
   //   .catch((err) => console.log(err));
   await AppDataSource.initialize();
   await AppDataSource.query(
-    `CREATE DATABASE IF NOT EXISTS \`healthcare-test\``
+    `CREATE DATABASE IF NOT EXISTS \`testdb\``
   )
 }, 30_000);
 
@@ -38,6 +38,6 @@ beforeEach(async function () {
 }, 30_000);
 
 afterAll(async function () {
-  await AppDataSource.query(`DROP DATABASE IF EXISTS \`healthcare-test\``);
+  await AppDataSource.query(`DROP DATABASE IF EXISTS \`testdb\``);
   await AppDataSource.destroy();
 }, 30_000);
