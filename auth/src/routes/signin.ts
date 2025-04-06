@@ -19,7 +19,10 @@ router.post(
   validateRequest,
   async (req: Request, res: Response) => {
     const { email, password } = req.body;
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email }).populate({
+      path: 'userType',
+      select: 'name',
+    });
     console.log({ existingUser });
     if (!existingUser) {
       throw new BadRequestError('Invalid credentials');
@@ -38,6 +41,7 @@ router.post(
       {
         id: existingUser.id,
         email: existingUser.email,
+        role: existingUser.userType.name,
       },
       process.env.JWT_KEY! // ! is for to tell the TS that this variable is already  defined
     );
@@ -50,7 +54,11 @@ router.post(
       jwt: userJwt,
     };
 
-    res.status(200).json(existingUser);
+    res.status(200).json({
+      id: existingUser.id,
+      email: existingUser.email,
+      role: existingUser.userType.name,
+    });
   }
 );
 

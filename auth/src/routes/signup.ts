@@ -3,6 +3,8 @@ import { body } from 'express-validator';
 import { User } from '../models/user';
 import { BadRequestError, validateRequest } from '@phntickets/common';
 import jwt from 'jsonwebtoken';
+import { UserType } from '../models/userType';
+import { allowedUserTypes } from '../utils/allowedUserTypes';
 
 const router = express.Router();
 
@@ -14,11 +16,14 @@ router.post(
       .trim()
       .isLength({ min: 4, max: 20 })
       .withMessage('Password must be between 4 and 20 characters'),
+    body('userType')
+      .isIn(allowedUserTypes)
+      .withMessage('User type required and it must be a string'),
   ],
   validateRequest,
   async (req: Request, res: Response) => {
-    const { email, password } = req.body;
-    console.log({ email, password });
+    const { email, password, userType } = req.body;
+    console.log({ email, password, userType });
 
     // check if user with this email is already exists
     const existingUser = await User.findOne({ email });
@@ -28,8 +33,20 @@ router.post(
       throw new BadRequestError('Email in use');
     }
 
+    const userRole = await UserType.findOne({ name: userType });
+    console.log({ userRole });
+
+    if (!userRole) {
+      throw new BadRequestError('User type not found');
+    }
+
     // save user in db
-    const user = User.build({ email, password });
+    const user = User.build({ 
+      email, 
+      password, 
+      userType: userRole 
+    });
+    
     await user.save();
 
     // generate JWT
@@ -38,6 +55,7 @@ router.post(
       {
         id: user.id,
         email: user.email,
+        role: user.userType.name,
       },
       process.env.JWT_KEY! // to tell the TS that this variable is already defined
     );
@@ -50,7 +68,11 @@ router.post(
       jwt: userJwt,
     };
 
-    res.status(201).json(user);
+    res.status(201).json({
+      id: user.id,
+      email: user.email,
+      role: user.userType.name,
+    });
   }
 );
 

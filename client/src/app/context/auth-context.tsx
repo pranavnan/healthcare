@@ -1,10 +1,12 @@
 'use client'
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
+import { ROUTES } from '@/constants/routes';
 
 interface User {
   id: string;
   email: string;
+  role: string;
 }
 
 interface AuthContextType {
@@ -21,10 +23,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  console.log({ currentUser });
+
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const { data } = await axios.get('/api/users/currentuser');
+        setLoading(true);
+        const { data } = await axios.get(ROUTES.CURRENT_USER);
         setCurrentUser(data.currentUser);
       } catch (err) {
         console.error('Failed to fetch current user', err);
@@ -38,7 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signin = async (email: string, password: string) => {
     try {
-      const response = await axios.post('/api/users/signin', { email, password });
+      const response = await axios.post(ROUTES.SIGNIN, { email, password });
       setCurrentUser(response.data);
     } catch (err) {
       console.error('Signin error', err);
@@ -48,7 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signup = async (email: string, password: string) => {
     try {
-      const response = await axios.post('/api/users/signup', { email, password });
+      const response = await axios.post(ROUTES.SIGNUP, { email, password, userType: 'user' });
       setCurrentUser(response.data);
     } catch (err) {
       console.error('Signup error', err);
@@ -58,7 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signout = async () => {
     try {
-      await axios.post('/api/users/signout');
+      await axios.post(ROUTES.SIGNOUT);
       setCurrentUser(null);
     } catch (err) {
       console.error('Signout error', err);

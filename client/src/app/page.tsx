@@ -4,9 +4,11 @@ import { useAuth } from './context/auth-context';
 import { Button } from './components/ui/Button';
 import Link from 'next/link';
 import styles from './page.module.css';
+import { useRouter } from 'next/navigation';
 
 export default function HomePage() {
   const { currentUser, loading } = useAuth();
+  const router = useRouter();
 
   if (loading) {
     return (
@@ -17,13 +19,26 @@ export default function HomePage() {
     );
   }
 
+  function redirectToRoutes() {
+    switch(currentUser?.role) {
+      case 'doctor':
+        router.push('/doctor');
+        break;
+      case 'admin':
+        router.push('/admin');
+        break;
+      default:
+        router.push('/dashboard');
+    }
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.hero}>
         <div className={styles.heroContent}>
           <h1 className={styles.title}>Modern Healthcare Platform</h1>
           <p className={styles.subtitle}>
-            Access medical services, manage your appointments, and stay connected with healthcare professionals.
+            Access medical services, manage your appointments, and stay connected with healthcare professionals 24/7.
           </p>
           
           {!currentUser ? (
@@ -37,9 +52,9 @@ export default function HomePage() {
             </div>
           ) : (
             <div className={styles.cta}>
-              <Link href="/dashboard" passHref>
-                <Button size="lg">Go to Dashboard</Button>
-              </Link>
+              {/* <Link href="/dashboard" passHref> */}
+                <Button size="lg" onClick={redirectToRoutes}>Go to Dashboard</Button>
+              {/* </Link> */}
             </div>
           )}
         </div>

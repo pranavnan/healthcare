@@ -16,6 +16,12 @@
   justify-content: space-between;
 }
 
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .logo {
   font-family: var(--font-geist-sans);
   font-size: 1.25rem;

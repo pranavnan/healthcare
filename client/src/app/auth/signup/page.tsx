@@ -6,9 +6,10 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Input } from '../../components/ui/Input';
-import { Button } from '../../components/ui/Button';
-import { useAuth } from '../../context/auth-context';
+import { Input } from '@/app/components/ui/Input';
+import { Button } from '@/app/components/ui/Button';
+import { useAuth } from '@/app/context/auth-context';
+import { ApiError } from '@/interface/apierror.interface';
 
 const signupSchema = z.object({
   email: z.string().email({ message: 'Email must be valid' }),
@@ -18,15 +19,6 @@ const signupSchema = z.object({
 });
 
 type SignupFormValues = z.infer<typeof signupSchema>;
-
-interface ApiError {
-  response?: {
-    data?: {
-      errors?: Array<{ message: string }>;
-    };
-  };
-  message?: string;
-}
 
 export default function SignUpPage() {
   const [error, setError] = useState('');
@@ -65,7 +57,7 @@ export default function SignUpPage() {
       </div>
       
       {error && (
-        <div style={{ color: '#ef4444', padding: '0.75rem', backgroundColor: '#fef2f2', borderRadius: '0.375rem', marginBottom: '1rem' }}>
+        <div className="error-message">
           {error}
         </div>
       )}

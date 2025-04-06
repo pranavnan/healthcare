@@ -29,9 +29,10 @@
   border: 1px solid #d1d5db;
   border-radius: 6px;
   outline: none;
-  background-color: white;
+  background-color: rgb(255, 255, 255);
   width: 100%;
   transition: all 0.2s ease;
+  color: #000;
 }
 
 .input::placeholder {

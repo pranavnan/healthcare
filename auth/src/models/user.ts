@@ -1,11 +1,12 @@
 import { Schema, model, Model, Document } from 'mongoose';
 import { Password } from '../services/password';
-
+import { UserType, UserTypeDoc } from './userType';
 // An interface that describes the properties that are requires to create a new User
 // the properties that are used to create a user or create a record
 interface UserAttrs {
   email: string;
   password: string;
+  userType: UserTypeDoc;
 }
 
 // the reason we created the above and below interface is because the properties that are required to create an user might be different than the properties that actually end up on an user
@@ -15,6 +16,7 @@ interface UserAttrs {
 interface UserDoc extends Document {
   email: string;
   password: string;
+  userType: UserTypeDoc;
 }
 
 // An interface that describe the properties that a user Model has
@@ -33,6 +35,11 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    userType: {
+      type: Schema.Types.ObjectId,
+      ref: 'UserType',
+      required: true,
+    },
   },
   {
     toJSON: {
@@ -42,7 +49,7 @@ const userSchema = new Schema(
         delete ret._id;
         delete ret.password;
         delete ret.__v;
-      },
+        },
     },
   }
 );
