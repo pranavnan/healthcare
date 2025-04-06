@@ -1,21 +1,15 @@
-import { BaseWebhookHandler } from '../base-webhook-handler';
+import { BaseHandler } from '../base-webhook-handler';
 import { WhatsAppWebhookPayload } from '../../types/webhooks/whatsapp-webhook.types';
 import { TYPES } from '../../inversify/types';
-import { BaseMessageHandler } from './base-message-handler';
 import { inject } from 'inversify';
 import { WhatsAppMessage } from '../../types/webhooks/whatsapp-message.types';
 
-export class MessageHandler extends BaseWebhookHandler {
-  private handler: BaseMessageHandler;
+export class MessageHandler extends BaseHandler<WhatsAppWebhookPayload> {
+  
   constructor(
-    @inject(TYPES.WhatsappWebhook.TextHandler) textHandler: BaseMessageHandler,
-    @inject(TYPES.WhatsappWebhook.ImageHandler) imageHandler: BaseMessageHandler
+    @inject(TYPES.WhatsappWebhook.MessageHandler) private handler: BaseHandler<WhatsAppMessage>
   ) {
     super();
-
-    textHandler.setNext(imageHandler);
-
-    this.handler = textHandler;
   }
 
   protected canHandle(payload: WhatsAppWebhookPayload): boolean {
@@ -23,6 +17,7 @@ export class MessageHandler extends BaseWebhookHandler {
       entry.changes.some((change) => change.value.messages)
     );
   }
+
   protected async processPayload(
     payload: WhatsAppWebhookPayload
   ): Promise<void> {

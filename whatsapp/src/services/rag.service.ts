@@ -27,6 +27,7 @@ import { ConversationHistoryType } from '../types/interaction-history/conversati
 import { QueryResponse, RecordMetadata } from '@pinecone-database/pinecone';
 import { getAvailableFunctions } from '../functions';
 import { IFunction } from '../interface/openai/function.interface';
+import { LogUtil } from '../utils/log-util';
 
 export class RAGService {
   constructor(
@@ -54,13 +55,13 @@ export class RAGService {
       let docs: QueryResponse<RecordMetadata> = { matches: [], namespace: '' };
 
       if (passedDocument) {
-        console.time('RAGService.getRAGResponse.getEmbeddings');
+        // console.time('RAGService.getRAGResponse.getEmbeddings');
         const embeddings = await this.getEmbeddings(userQuery);
-        console.timeEnd('RAGService.getRAGResponse.getEmbeddings');
+        // console.timeEnd('RAGService.getRAGResponse.getEmbeddings');
         if (!embeddings) {
           throw new Error('Could not generate embeddings');
         }
-        console.time('RAGService.getRAGResponse.getDocuments');
+        // console.time('RAGService.getRAGResponse.getDocuments');
         docs = await this.docsRetrieverService.getDocuments(
           PINECONE_INDEX,
           PINECONE_INDEX_TOP_K,
@@ -68,7 +69,7 @@ export class RAGService {
           PINECONE_INCLUDE_METADATA,
           PINECONE_INCLUDE_VALUES
         );
-        console.timeEnd('RAGService.getRAGResponse.getDocuments');
+        // console.timeEnd('RAGService.getRAGResponse.getDocuments');
 
         if (!docs) {
           throw new Error('Could not get documents');
@@ -85,7 +86,8 @@ export class RAGService {
       //   this.docsRetrieverService.getFormattedDocuments(docs);
 
       const history = this.buildHistory(userConversationHistory);
-      console.log(systemPrompt, '\n\n', systemPrompt);
+      // console.log('systemPrompt', '\n\n', systemPrompt);
+      LogUtil.debug(systemPrompt);
       // console.dir({ history }, { depth: null });
 
       const messages: ChatCompletionMessageParam[] = [
@@ -104,15 +106,15 @@ export class RAGService {
 
       const functionTools = this.getFunctionTools(availableFunction);
 
-      console.time('RAGService.getRAGResponse');
+      // console.time('RAGService.getRAGResponse');
       const response = await this.aiChatCompletionService.completion(
         messages,
         OPENAI_COMPLETION_MODEL,
         functionTools
       );
-      console.timeEnd('RAGService.getRAGResponse');
-      console.dir({ response }, { depth: null });
-
+      // console.timeEnd('RAGService.getRAGResponse');
+      // console.dir({ response }, { depth: null });
+      LogUtil.logObject(response, 'response');
       const responseText = response?.choices[0].message.content;
       const functionCall = response?.choices[0].message.tool_calls;
 

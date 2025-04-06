@@ -1,12 +1,12 @@
 import { WhatsAppMessage } from '../../types/webhooks/whatsapp-message.types';
-import { BaseMessageHandler } from './base-message-handler';
+import { BaseHandler } from '../base-webhook-handler';
 
-export class ImageHandler extends BaseMessageHandler {
-  protected canHandleMessage(payload: WhatsAppMessage): boolean {
+export class ImageHandler extends BaseHandler<WhatsAppMessage> {
+  protected canHandle(payload: WhatsAppMessage): boolean {
     return payload[0].type === 'image';
   }
 
-  protected async processMessagePayload(
+  protected async processPayload(
     payload: WhatsAppMessage
   ): Promise<void> {
     console.log('Image message received:', payload);

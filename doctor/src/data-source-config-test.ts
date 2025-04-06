@@ -13,5 +13,4 @@ const TestDataSource: DataSourceOptions = {
   entities: ['src/entities/*{.ts,.js}'], // always give the path from root of our project
   // logging: true, // this will log each and every query executed by typeorm
 };
-// dummy push
 export { TestDataSource };
